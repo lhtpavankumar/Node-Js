@@ -1,13 +1,29 @@
 import * as yup from "yup";
 import HTTPHandler from "../app/utils/HTTPHandler";
-
+import LHTLogger from "../app/utils/logger";
 
 export default {
-  validateUserLogin: async (req, res, next) => {
+  validateName: async (req, res, next) => {
     const schema = yup.object().shape({
-      email: yup.string().email(),
+      id: yup.string().required(),
+      name: yup.string().required(),
     });
-    await validate(schema, req.query, res, next);
+    await validate(schema, req.body, res, next);
+  },
+
+  validateDelete: async (req, res, next) => {
+    const schema = yup.object().shape({
+      id: yup.string().required(),
+    });
+    await validate(schema, req.body, res, next);
+  },
+
+  validateUpload: async (req, res, next) => {
+    LHTLogger.info("validateCreateUser", "Inside validateUpload", req.body);
+    const schema = yup.object().shape({
+      name: yup.string().required(),
+    });
+    await validate(schema, req.body, res, next);
   },
 };
 
@@ -21,6 +37,7 @@ const validate = async (schema, reqData, res, next) => {
       message,
       value,
     }));
+    console.log("GOT ERROR", errors);
     HTTPHandler.validationError(res, errors);
   }
 };

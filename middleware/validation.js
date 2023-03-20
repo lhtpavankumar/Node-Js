@@ -9,6 +9,15 @@ export default {
     });
     await validate(schema, req.query, res, next);
   },
+
+  validateCreateUser: async (req, res, next) => {
+    const schema = yup.object().shape({
+      name: yup.string().required(),
+      email: yup.string().required(),
+      role: yup.string().required(),
+    });
+    await validate(schema, req.body, res, next);
+  },
 };
 
 const validate = async (schema, reqData, res, next) => {

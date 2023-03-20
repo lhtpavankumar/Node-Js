@@ -20,6 +20,9 @@ export default {
 
   validateUpload: async (req, res, next) => {
     LHTLogger.info("validateCreateUser", "Inside validateUpload", req.body);
+    if (!req.file) {
+      return HTTPHandler.validationError(res, "No File Uploaded");
+    }
     const schema = yup.object().shape({
       name: yup.string().required(),
     });

@@ -25,6 +25,9 @@ const upload = multer({
   storage: storage, limits: {
     fileSize: 1000000
   }, fileFilter: (req, file, cb) => {
+    if (!req.file) {
+      cb(new Error("Empty File."), false);
+    }
     if (apiFailureMessage.SUPPORTED_FORMATS.includes(file.mimetype)) {
       cb(null, true);
     }
@@ -32,7 +35,8 @@ const upload = multer({
       console.log("FILe", file.mimetype)
       cb(new Error('File type not supported.'), false);
     }
-} });
+  }
+});
 
 export default (app) => {
   app.get("/", (_req, res) => res.send(stringConstants.SERVICE_STATUS_HTML));
@@ -41,7 +45,7 @@ export default (app) => {
    * route definition
    */
   app.post("/upload", upload.single('file'), ValidationManger.validateUpload, new Upload().upload);
-  
+
   app.post("/rename", ValidationManger.validateName, new Upload().rename)
 
   app.delete("/delete", ValidationManger.validateDelete, new Upload().delete);

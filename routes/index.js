@@ -1,8 +1,7 @@
 /**
  * Created by AyushK on 18/09/20.
  */
-import ValidationManger from "../middleware/validation";
-import Template from "../app/modules/Template";
+import Fetch from "../app/modules/fetch"
 import {stringConstants} from "../app/common/constants";
 
 export default (app) => {
@@ -11,6 +10,8 @@ export default (app) => {
     /**
      * route definition
      */
-    app.get("/success-route", ValidationManger.validateUserLogin, new Template().successRoute);
-    app.get("/failure-route",  new Template().failureRoute);
+    // app.get("/success-route", ValidationManger.validateUserLogin, new Template().successRoute);
+    // app.get("/failure-route", new Template().failureRoute);
+    
+    app.get("/user", new Fetch().getDetails);
 };

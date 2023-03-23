@@ -58,10 +58,15 @@ export default class BLManager {
       throw apiFailureMessage.DOESNT_EXISTS;
     }
 
-    return await CustomerModel.findOneAndUpdate(
+    let updatedData = await CustomerModel.findOneAndUpdate(
       { _id: requestData.body.id },
-      { name: requestData.body.name }
+      requestData.body,
+      { new: true }
     );
+    console.log("updatedData", updatedData);
+
+    return updatedData;
+
   }
 
   async deleteUser(requestData) {
@@ -75,6 +80,6 @@ export default class BLManager {
       throw apiFailureMessage.DOESNT_EXISTS;
     }
 
-    return await  CustomerModel.findByIdAndDelete({ _id: requestData.body.id });
+    return await CustomerModel.findByIdAndDelete({ _id: requestData.body.id });
   }
 }

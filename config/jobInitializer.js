@@ -12,7 +12,7 @@ import fs from "fs";
   │ │ │ │ │ ┌──── day of week
   * * * * * *
 */
-cron.schedule("*/60 * * * * *", async () => {
+cron.schedule("* * * * * ", async () => {
   LHTLogger.info("Cron:schedule", "cron job running");
   // Data to write on file
   let data = `${new Date().toUTCString()} : Server is working\n`;

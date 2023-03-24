@@ -1,7 +1,7 @@
 import LHTLogger from "../../utils/logger";
 import fs from "fs";
 import csv from "csv-parser";
-import path from "path";
+import path, { resolve } from "path";
 import { createObjectCsvWriter as createCsvWriter } from "csv-writer";
 
 export default class BLManager {
@@ -21,38 +21,42 @@ export default class BLManager {
     });
     let data = [];
 
-    // Use the csv-parser library to read the input CSV file
-    fs.createReadStream(inputFile)
-      .pipe(csv())
-      .on("data", (row) => {
-        console.log("ROW", row);
-        // Check if the row already has a password
-        if (!row.Password) {
-          // Generate a new password
-          const newPassword = generateNewPassword(12);
-          console.log("newPassword", newPassword);
+    try {
+      // Use the csv-parser library to read the input CSV file
+      await new Promise((resolve, reject) => {
+        fs.createReadStream(inputFile)
+          .pipe(csv())
+          .on("data", (row) => {
+            console.log("ROW", row);
+            // Check if the row already has a password
+            if (!row.Password) {
+              // Generate a new password
+              const newPassword = generateNewPassword(12);
+              console.log("newPassword", newPassword);
 
-          // Add the new password to the row
-          row.Password = newPassword;
-        }
-        data.push(row);
+              // Add the new password to the row
+              row.Password = newPassword;
+            }
+            data.push(row);
+          })
+          .on("end", () => {
+            console.log("DATA------", data);
+            if (data.length <= 0) {
+              console.log("Working");
+              reject("Empty File");
+            }
+            // Write the updated data to the output CSV file
+            csvWriter.writeRecords(data).then(() => {
+              console.log("CSV file successfully updated");
+              resolve("CSV file successfully updated");
+            });
+          })
       })
-      .on("end", () => {
-        console.log("DATA------", data);
-        if (data.length <= 0) {
-          console.log("Working");
-          throw "Empty File";
-        }
-        // Write the updated data to the output CSV file
-        csvWriter.writeRecords(data).then(() => {
-          console.log("CSV file successfully updated");
-        });
-      })
-      .on("error", () => {
-        console.log("ERROR", error);
-      });
-
-    return ("Done! CSV file Successfully Updated");
+      return "CSV file successfully updated";
+    }
+    catch (e) {
+      throw e;
+    }
   }
 }
 

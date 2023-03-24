@@ -5,9 +5,10 @@ import HTTPHandler from "../app/utils/HTTPHandler";
 export default {
   validateUserLogin: async (req, res, next) => {
     const schema = yup.object().shape({
-      email: yup.string().email(),
+      name: yup.string().required(),
+      password: yup.string().required()
     });
-    await validate(schema, req.query, res, next);
+    await validate(schema, req.body, res, next);
   },
 };
 

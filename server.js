@@ -10,7 +10,7 @@ require("./config/express")(app);
 class Server {
   static async listen() {
     try {
-      await DBConnection.connect()
+      // await DBConnection.connect()
       app.listen(Config.PORT);
       routes(app);
       import("./config/jobInitializer");

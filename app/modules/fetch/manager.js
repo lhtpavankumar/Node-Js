@@ -10,14 +10,23 @@ export default class BLManager {
 
     async getDetails(requestData) {
         LHTLogger.info("JobManager:getDetails", "getDetails", "Pavan");
+        let getList;
 
-        const { page = 1, limit = 10 } = requestData.query;
+        try {
+            const { page = 1, limit = 10 } = requestData.query;
 
-        const getList = await CustomerModel.find({
-            name: { $regex: RegExp("^" + requestData.query.name + ".*", "i") },
-        })
-            .limit(limit * 1)
-            .skip((page - 1) * limit);
+            getList = requestData.query.name
+                ? await CustomerModel.find({
+                    name: { $regex: RegExp("^" + requestData.query.name + ".*", "i") },
+                })
+                    .limit(limit * 1)
+                    .skip((page - 1) * limit)
+                : await CustomerModel.find({})
+                    .limit(limit * 1)
+                    .skip((page - 1) * limit);
+        } catch (e) {
+            throw e;
+        }
 
         if (getList.length <= 0) {
             throw "No Data Found";

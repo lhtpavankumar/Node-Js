@@ -1,8 +1,7 @@
-import LHTLogger from "../../utils/logger";
 import fs from "fs";
 import csv from "csv-parser";
-import path, { resolve } from "path";
-import { createObjectCsvWriter as createCsvWriter } from "csv-writer";
+import path from "path";
+import { createObjectCsvWriter } from "csv-writer";
 
 export default class BLManager {
   async verifyCSV(_requestData) {
@@ -12,7 +11,7 @@ export default class BLManager {
     const outputFile = "./output.csv";
 
     // Create a new CSV writer object
-    const csvWriter = createCsvWriter({
+    const updatedFile = createObjectCsvWriter({
       path: outputFile,
       header: [
         { id: "Name", title: "Name" },
@@ -46,7 +45,7 @@ export default class BLManager {
               reject("Empty File");
             }
             // Write the updated data to the output CSV file
-            csvWriter.writeRecords(data).then(() => {
+            updatedFile.writeRecords(data).then(() => {
               console.log("CSV file successfully updated");
               resolve("CSV file successfully updated");
             });

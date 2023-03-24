@@ -1,26 +1,27 @@
-import APP from "express";
-import DBConnection from "./config/dbConnection";
-import LhtLogger from "./app/utils/logger";
-import Config from "./config";
-import routes from "./routes";
+import express from "express";
 
-const app = new APP();
-require("./config/express")(app);
+const app = express();
 
-class Server {
-  static async listen() {
-    try {
-      await DBConnection.connect()
-      app.listen(Config.PORT);
-      routes(app);
-      import("./config/jobInitializer");
-      LhtLogger.info("Server:listen", `Server Started on ${Config.PORT}`, {}, "Ayush K");
-    } catch (error) {
-      LhtLogger.error("Server:listen", "failed to connect", { err: error });
-      process.exit(1);
+app.get("/", (req, res) => {
+  let out = req.query.name;
+
+  let promise = new Promise((resolve, reject) => {
+    if (out !== undefined && out !== "") {
+      resolve("Hello " + out + ", nice to see u here");
+    } else {
+      reject("Check or Add Inputs");
     }
-  }
-}
+  });
 
-Server.listen();
-module.exports = app;
+  promise
+    .then((response) => {
+      res.status(200).json({ Success: response });
+    })
+    .catch((err) => {
+      res.status(400).json({ error: ` ${err}` });
+    });
+});
+
+app.listen(3000, () => {
+  console.log("Server Started");
+});

@@ -3,11 +3,11 @@ import csv from "csv-parser";
 import path from "path";
 import { createObjectCsvWriter } from "csv-writer";
 
+
 export default class BLManager {
   async verifyCSV(_requestData) {
     // Set the input and output file paths
-    const inputFile = path.resolve(__dirname, "./input.csv");
-
+    const inputFile = path.resolve(__dirname, "../../../input.csv");
     const outputFile = "./output.csv";
 
     // Create a new CSV writer object

@@ -31,7 +31,7 @@ export default class BLManager {
             if (!row.Password) {
               // Generate a new password
               const newPassword = generateNewPassword(12);
-              console.log("newPassword", newPassword);
+              //console.log("newPassword", newPassword);
 
               // Add the new password to the row
               row.Password = newPassword;
@@ -41,12 +41,10 @@ export default class BLManager {
           .on("end", () => {
             console.log("DATA------", data);
             if (data.length <= 0) {
-              console.log("Working");
               reject("Empty File");
             }
             // Write the updated data to the output CSV file
             updatedFile.writeRecords(data).then(() => {
-              console.log("CSV file successfully updated");
               resolve("CSV file successfully updated");
             });
           })

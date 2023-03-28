@@ -3,6 +3,8 @@ import DBConnection from "./config/dbConnection";
 import LhtLogger from "./app/utils/logger";
 import Config from "./config";
 import routes from "./routes";
+//TODO : Take apth for input
+
 
 const app = new APP();
 require("./config/express")(app);

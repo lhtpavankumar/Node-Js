@@ -1,57 +1,28 @@
 import fs from "fs";
-import csv from "csv-parser";
+// import csv from "csv-parser";
 import path from "path";
-import { createObjectCsvWriter } from "csv-writer";
-
+// import { createObjectCsvWriter } from "csv-writer";
+import crypto from "crypto";
 
 export default class BLManager {
   async verifyCSV(_requestData) {
     // Set the input and output file paths
-    const inputFile = path.resolve(__dirname, "../../../input.csv");
-    const outputFile = "./output.csv";
-
-    // Create a new CSV writer object
-    const updatedFile = createObjectCsvWriter({
-      path: outputFile,
-      header: [
-        { id: "Name", title: "Name" },
-        { id: "Password", title: "Password" },
-      ],
-    });
-    let data = [];
+    const inputFile = path.resolve(__dirname, "../../../input.csv"); // TODO :
 
     try {
-      // Use the csv-parser library to read the input CSV file
       await new Promise((resolve, reject) => {
-        fs.createReadStream(inputFile)
-          .pipe(csv())
-          .on("data", (row) => {
-            console.log("ROW", row);
-            // Check if the row already has a password
-            if (!row.Password) {
-              // Generate a new password
-              const newPassword = generateNewPassword(12);
-              //console.log("newPassword", newPassword);
-
-              // Add the new password to the row
-              row.Password = newPassword;
-            }
-            data.push(row);
-          })
-          .on("end", () => {
-            console.log("DATA------", data);
-            if (data.length <= 0) {
-              reject("Empty File");
-            }
-            // Write the updated data to the output CSV file
-            updatedFile.writeRecords(data).then(() => {
-              resolve("CSV file successfully updated");
-            });
-          })
-      })
-      return "CSV file successfully updated";
-    }
-    catch (e) {
+        if (!fs.existsSync(inputFile)) {
+          reject("Empty File");
+        }
+        let lines = readInputFile(inputFile);
+        console.log("LINES", lines);
+        let results = checkAndGenerateNewPassword(lines);
+        console.log("RESULTS", results);
+        pushUpdatedDataToANewCSVFile(results);
+        resolve();
+      });
+      return "CSV FILE UPDATED SUCCESFULLY";
+    } catch (e) {
       throw e;
     }
   }
@@ -59,18 +30,59 @@ export default class BLManager {
 
 // Function to generate a new password
 const generateNewPassword = (length) => {
-  const lowercaseChars = "abcdefghijklmnopqrstuvwxyz";
-  const uppercaseChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  const numericChars = "0123456789";
-  const symbolChars = "!@#$%^&*";
+  // Create a buffer to store the random bytes
+  const buffer = crypto.randomBytes(length);
 
-  let allChars = lowercaseChars + uppercaseChars + numericChars + symbolChars;
-  let password = "";
+  // Convert the buffer to a string using base64 encoding
+  const password = buffer.toString("base64");
 
-  for (let i = 0; i < length; i++) {
-    password += allChars.charAt(Math.floor(Math.random() * allChars.length));
-  }
-  console.log("Password", password);
-
+  // Return the password
   return password;
+};
+
+const readInputFile = (inputFile) => {
+  const data = fs.readFileSync(inputFile, "utf8");
+  const lines = data.trim().split(/\r?\n/);
+  console.log("lines", lines);
+
+  // get the header row (first row) of the CSV
+  const rowSliced = lines.slice(1);
+
+  if (rowSliced <= 0) {
+    console.log("WORKING AT ROWSLICED");
+    throw "EMPTY FILE";
+  }
+
+  return lines;
+};
+
+const checkAndGenerateNewPassword = (data) => {
+  const updatedCSVData = [];
+  console.log("DATA", data);
+
+  data.forEach((line) => {
+    const fields = line.split(",");
+    updatedCSVData.push(fields);
+  });
+
+  updatedCSVData.forEach((row) => {
+    if (!row[1]) {
+      const newPassword = generateNewPassword(6);
+      row[1] = newPassword;
+    }
+  });
+  console.log("updatedCSVData", updatedCSVData);
+
+  return updatedCSVData;
+};
+
+const pushUpdatedDataToANewCSVFile = async (data) => {
+  const csvData = data.map((row) => row.join(",")).join("\n");
+  try {
+    fs.writeFileSync("./output.csv", csvData);
+  } catch (e) {
+    throw e;
+  }
+
+  return true;
 };

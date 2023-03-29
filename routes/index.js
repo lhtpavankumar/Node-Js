@@ -25,9 +25,6 @@ const upload = multer({
   storage: storage, limits: {
     fileSize: 1000000
   }, fileFilter: (req, file, cb) => {
-    if (!req.file) {
-      cb(new Error("Empty File."), false);
-    }
     if (apiFailureMessage.SUPPORTED_FORMATS.includes(file.mimetype)) {
       cb(null, true);
     }
